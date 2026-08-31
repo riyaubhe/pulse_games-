@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-correct: #10b981;
+  --color-present: #f59e0b;
+  --color-absent: #ef4444;
+  --color-border: rgba(255,255,255,0.05);
+  --color-dark: #09090b;
+  --color-accent: #8b5cf6;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-glow: 0 0 20px -5px rgba(139, 92, 246, 0.3);
+}
+
+body {
+  @apply bg-dark text-zinc-100 font-sans antialiased overflow-x-hidden;
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  @apply flex flex-col items-center w-full;
+}
+
+.cell {
+  @apply w-12 h-12 sm:w-14 sm:h-14 border-2 border-border flex items-center justify-center text-2xl sm:text-3xl font-extrabold uppercase transition-all duration-300 rounded-sm bg-zinc-900/50 backdrop-blur-sm;
+  font-family: var(--font-display);
+}
+
+.cell.correct { @apply bg-correct border-correct text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]; }
+.cell.present { @apply bg-present border-present text-white shadow-[0_0_15px_rgba(245,158,11,0.3)]; }
+.cell.absent { @apply bg-absent border-absent text-white; }
+.cell.filled { @apply border-zinc-500 scale-105 bg-zinc-800; }
+
+.key {
+  @apply h-12 sm:h-14 min-w-[2rem] sm:min-w-[2.5rem] px-1.5 sm:px-2 bg-zinc-800 rounded-md flex items-center justify-center font-bold uppercase cursor-pointer hover:bg-zinc-700 active:scale-95 transition-all text-[11px] sm:text-sm;
+  font-family: var(--font-display);
+}
+
+.key.large { @apply px-6; }
+.key.correct { @apply bg-correct text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]; }
+.key.present { @apply bg-present text-white shadow-[0_0_10px_rgba(245,158,11,0.3)]; }
+.key.absent { @apply bg-absent text-white opacity-40; }
+
+.glass-panel {
+  @apply bg-zinc-900/40 backdrop-blur-xl border border-white/5 shadow-2xl rounded-2xl p-6 sm:p-8;
+}
+
+.premium-gradient {
+  @apply bg-gradient-to-br from-accent via-violet-600 to-indigo-700;
+}
+
+.grid-cell {
+  @apply w-9 h-9 rounded-md border border-white/5 bg-zinc-900/50 flex items-center justify-center font-bold text-sm uppercase transition-all;
+  font-family: var(--font-display);
+}
+.grid-cell.selected { @apply bg-accent/30 border-accent; }
+.grid-cell.found { @apply bg-correct/80 border-correct text-white; }
+
+.chip {
+  @apply px-3 py-1.5 rounded-full text-xs font-bold bg-zinc-800/80 border border-white/5 text-zinc-300;
+}
+.chip.hit { @apply bg-correct/20 border-correct/40 text-correct; }
