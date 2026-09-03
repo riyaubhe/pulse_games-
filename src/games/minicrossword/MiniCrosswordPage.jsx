@@ -78,7 +78,7 @@ export default function MiniCrosswordPage() {
   return (
     <GameShell emoji="⬛" title="Mini Crossword" tag="A tiny 5×5 crossword." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Fill the grid using the clues below. Click Check to see which letters are right so far.</p>

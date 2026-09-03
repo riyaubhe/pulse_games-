@@ -45,7 +45,7 @@ export default function RiddleRushPage() {
   return (
     <GameShell emoji="🧩" title="Riddle Rush" tag="Solve 5 classic riddles as fast as you can." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Riddle {idx + 1} of {RIDDLES.length}.</p>

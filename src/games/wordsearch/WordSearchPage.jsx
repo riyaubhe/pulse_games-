@@ -97,7 +97,7 @@ export default function WordSearchPage() {
   return (
     <GameShell emoji="🔍" title="Word Search" tag="Find all 6 hidden study words." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">

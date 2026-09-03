@@ -96,7 +96,7 @@ export default function WordlePage() {
   return (
     <GameShell emoji="🟩" title="Wordle" tag="Guess the 5-letter word in 6 tries." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">

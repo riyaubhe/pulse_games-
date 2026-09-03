@@ -42,7 +42,7 @@ export default function WordChainPage() {
   return (
     <GameShell emoji="🍫" title="Word Chain Sprint" tag="List study snacks & supplies before time runs out." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">

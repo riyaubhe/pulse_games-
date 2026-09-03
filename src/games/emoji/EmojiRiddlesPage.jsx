@@ -45,7 +45,7 @@ export default function EmojiRiddlesPage() {
   return (
     <GameShell emoji="😄" title="Emoji Riddles" tag="Decode 5 emoji clues." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Type your guess for what the emoji pair spells out. Riddle {idx + 1} of {RIDDLES.length}.</p>

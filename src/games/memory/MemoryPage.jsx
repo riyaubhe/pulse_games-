@@ -56,7 +56,7 @@ export default function MemoryPage() {
   return (
     <GameShell emoji="🧠" title="Memory Match" tag="Flip cards and find all 8 pairs." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Flip two cards at a time. Find all 8 pairs in as few moves as possible.</p>

@@ -87,7 +87,7 @@ export default function FinaleWordlePage() {
   return (
     <GameShell emoji="🏆" title="Championship Wordle" tag="Season finale — double points!" week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Same rules as Wordle, longer word, double points. 6 tries.</p>

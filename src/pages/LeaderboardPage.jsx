@@ -31,7 +31,14 @@ export default function LeaderboardPage() {
   const visibleWeeks = activeWeek <= 0 ? [] : GAMES.filter((g) => g.week <= Math.min(activeWeek, 14));
   const weekBoards = visibleWeeks
     .map((g) => {
-      const entries = Object.entries(lb.weeks?.[g.week] || {}).sort((a, b) => b[1] - a[1]);
+      const players = lb.weeks?.[g.week] || {};
+      const entries = Object.entries(players)
+        .map(([name, days]) => {
+          const values = Object.values(days || {});
+          const total = values.reduce((sum, v) => sum + v, 0);
+          return [name, total, values.length];
+        })
+        .sort((a, b) => b[1] - a[1]);
       return { ...g, entries };
     })
     .sort((a, b) => b.week - a.week);
@@ -42,7 +49,7 @@ export default function LeaderboardPage() {
         <Trophy className="w-6 h-6 text-accent" />
         <h2 className="text-2xl font-black font-display">Team Leaderboard</h2>
       </div>
-      <p className="text-zinc-500 text-sm mb-6">Season total (best score per week, summed across all 14 weeks)</p>
+      <p className="text-zinc-500 text-sm mb-6">Season total (daily scores combined across the whole week, summed across all 14 weeks)</p>
 
       {totalsArr.length === 0 ? (
         <div className="text-zinc-600 text-sm text-center py-8">No scores yet — be the first to play a game!</div>
@@ -81,17 +88,22 @@ export default function LeaderboardPage() {
                     <tr className="text-zinc-500 text-[10px] uppercase tracking-widest text-left border-b border-white/5">
                       <th className="py-2 w-10"></th>
                       <th className="py-2">Tutor</th>
-                      <th className="py-2 text-right">Score</th>
+                      <th className="py-2 text-right">Days</th>
+                      <th className="py-2 text-right">Total</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {w.entries.map(([name, score], i) => (
-                      <tr key={name} className={`border-b border-white/5 ${name === player ? 'bg-accent/5' : ''}`}>
-                        <td className="py-2 font-mono text-accent">{medal(i)}</td>
-                        <td className="py-2">{name}</td>
-                        <td className="py-2 text-right font-mono text-correct">{score}</td>
-                      </tr>
-                    ))}
+                    {w.entries.map(([name, total, days]) => {
+                      const i = w.entries.findIndex((e) => e[0] === name);
+                      return (
+                        <tr key={name} className={`border-b border-white/5 ${name === player ? 'bg-accent/5' : ''}`}>
+                          <td className="py-2 font-mono text-accent">{medal(i)}</td>
+                          <td className="py-2">{name}</td>
+                          <td className="py-2 text-right font-mono text-zinc-500">{days}</td>
+                          <td className="py-2 text-right font-mono text-correct">{total}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}

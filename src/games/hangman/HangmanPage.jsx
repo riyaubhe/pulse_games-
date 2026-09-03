@@ -64,7 +64,7 @@ export default function HangmanPage() {
   return (
     <GameShell emoji="🪢" title="Hangman" tag="Guess the academic word before you run out of tries." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Guess one letter at a time. {MAX_WRONG} wrong guesses before it's over.</p>

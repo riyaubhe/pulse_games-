@@ -52,7 +52,7 @@ export default function NumberHuntPage() {
   return (
     <GameShell emoji="🎯" title="Number Hunt" tag="Find the secret number 1–200 in 8 guesses." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Type a guess and press Enter — you'll get a higher/lower hint. Fewer guesses means a higher score.</p>

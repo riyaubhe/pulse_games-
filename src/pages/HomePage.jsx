@@ -11,7 +11,8 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { player } = usePlayer();
   const [week, setWeek] = useState(null);
-  const [best, setBest] = useState(null);
+  const [weekTotal, setWeekTotal] = useState(null);
+  const [daysPlayed, setDaysPlayed] = useState(0);
 
   useEffect(() => {
     setWeek(getActiveWeek());
@@ -21,10 +22,17 @@ export default function HomePage() {
     if (week === null || week < 1 || week > 14) return;
     getLeaderboard()
       .then((data) => {
-        const b = data.weeks?.[week]?.[player];
-        setBest(typeof b === 'number' ? b : null);
+        const days = data.weeks?.[week]?.[player];
+        if (days && typeof days === 'object') {
+          const values = Object.values(days);
+          setWeekTotal(values.length ? values.reduce((sum, v) => sum + v, 0) : null);
+          setDaysPlayed(values.length);
+        } else {
+          setWeekTotal(null);
+          setDaysPlayed(0);
+        }
       })
-      .catch(() => setBest(null));
+      .catch(() => { setWeekTotal(null); setDaysPlayed(0); });
   }, [week, player]);
 
   if (week === null) return null;
@@ -84,9 +92,9 @@ export default function HomePage() {
       </div>
       <div className="glass-panel relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 premium-gradient" />
-        {best !== null && (
+        {weekTotal !== null && (
           <div className="inline-block mb-3 text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-correct/15 text-correct border border-correct/20">
-            ✓ played · best {best} pts
+            ✓ played {daysPlayed} day{daysPlayed === 1 ? '' : 's'} · {weekTotal} pts this week
           </div>
         )}
         <div className="text-4xl mb-2">{game.emoji}</div>
@@ -96,7 +104,7 @@ export default function HomePage() {
           onClick={() => navigate(`/games/${game.slug}`)}
           className="premium-gradient px-6 py-4 rounded-xl font-black text-lg inline-flex items-center gap-2 hover:shadow-glow transition-all active:scale-[0.98] uppercase tracking-wide"
         >
-          <PlayCircle className="w-5 h-5" /> {best !== null ? "Play again" : "Play this week's game"}
+          <PlayCircle className="w-5 h-5" /> {weekTotal !== null ? "Play again" : "Play this week's game"}
         </button>
       </div>
     </motion.div>

@@ -47,7 +47,7 @@ export default function MathSprintPage() {
   return (
     <GameShell emoji="➗" title="Math Sprint" tag="Solve as many problems as you can in 60s." week={week}>
       {result ? (
-        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} />
+        <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">Solve the equation and press Enter. A new one appears immediately either way.</p>
