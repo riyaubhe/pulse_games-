@@ -25,8 +25,10 @@ export const getLeaderboard = async () => {
   return response.data; // { weeks: {...}, totals: {...} }
 };
 
-export const submitScore = async (week, player, score, dateKey) => {
-  const response = await api.post('/leaderboard', { week, player, score, dateKey });
+export const submitScore = async (week, player, score, dateKey, meta) => {
+  const body = { week, player, score, dateKey };
+  if (meta) body.meta = meta;
+  const response = await api.post('/leaderboard', body);
   return response.data;
 };
 

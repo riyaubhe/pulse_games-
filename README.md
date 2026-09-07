@@ -63,7 +63,7 @@ Update it once per season and redeploy — nothing else needs touching.
 | Week | Game |
 |---|---|
 | 1 | Wordle |
-| 2 | Word Scramble |
+| 2 | Zip (LinkedIn Zip-style path puzzle) |
 | 3 | Word Search |
 | 4 | Math Sprint |
 | 5 | Memory Match |

@@ -1,14 +1,18 @@
 // Vercel serverless function: /api/leaderboard
 // GET  -> returns the current leaderboard { weeks, totals }
-//         where weeks[week][player] is an object of { dateKey: score },
-//         one entry per day that player played that week's game.
-// POST -> body { week, player, score, dateKey } submits a score for
-//         a specific day. Keeps only the best score per player per
-//         DAY (so replaying the same day's puzzle doesn't inflate
-//         things), then the week's total for that player is the SUM
-//         of their best score from every day they played that week --
-//         so someone who plays all 5 days beats someone who only
-//         played once, even with a lower single-day score.
+//         where weeks[week][player] is an object of { dateKey: value },
+//         one entry per day that player played that week's game. Value
+//         is either a plain number (score) for most games, or an
+//         object { score, time } for games that track completion time
+//         (like Zip) -- `score` still feeds the season point totals,
+//         `time` is extra metadata the leaderboard can display/sort by.
+// POST -> body { week, player, score, dateKey, meta } submits a score
+//         for a specific day, with optional extra metadata (e.g.
+//         { time: 42.3 } for a timed game). Keeps only the best score
+//         per player per DAY, then the week's total for that player is
+//         the SUM of their best score from every day they played that
+//         week -- so someone who plays all 5 days beats someone who
+//         only played once, even with a lower single-day score.
 //
 // Backward compatible: earlier versions of this file stored a single
 // number per player per week (not per-day). Any data in that old shape
@@ -32,16 +36,22 @@ function migrateWeeks(weeks) {
     migrated[week] = {};
     Object.entries(players || {}).forEach(([name, value]) => {
       // Old format: value was a plain number. New format: an object of
-      // { dateKey: score }. Wrap any old-format number so it survives.
+      // { dateKey: value }. Wrap any old-format number so it survives.
       migrated[week][name] = typeof value === "number" ? { legacy: value } : value;
     });
   });
   return migrated;
 }
 
+function dayScore(v) {
+  // A day's value is either a plain number, or { score, ...meta }
+  if (typeof v === "number") return v;
+  if (v && typeof v.score === "number") return v.score;
+  return 0;
+}
+
 function weekTotal(playerDays) {
-  // playerDays is { dateKey: score, ... } -- sum every day's best score
-  return Object.values(playerDays || {}).reduce((sum, v) => sum + v, 0);
+  return Object.values(playerDays || {}).reduce((sum, v) => sum + dayScore(v), 0);
 }
 
 function recomputeSeasonTotals(weeks) {
@@ -63,7 +73,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
-    const { week, player, score, dateKey } = req.body || {};
+    const { week, player, score, dateKey, meta } = req.body || {};
     if (!week || !player || typeof score !== "number" || !dateKey) {
       return res.status(400).json({ error: "Missing week, player, score, or dateKey" });
     }
@@ -74,8 +84,10 @@ export default async function handler(req, res) {
     if (!lb.weeks[week]) lb.weeks[week] = {};
     if (!lb.weeks[week][player]) lb.weeks[week][player] = {};
 
-    const prevDayBest = lb.weeks[week][player][dateKey] || 0;
-    if (score > prevDayBest) lb.weeks[week][player][dateKey] = score;
+    const prevDayBest = dayScore(lb.weeks[week][player][dateKey]);
+    if (score > prevDayBest) {
+      lb.weeks[week][player][dateKey] = meta && typeof meta === "object" ? { score, ...meta } : score;
+    }
 
     lb.totals = recomputeSeasonTotals(lb.weeks);
 

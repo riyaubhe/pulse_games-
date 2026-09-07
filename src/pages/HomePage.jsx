@@ -25,7 +25,8 @@ export default function HomePage() {
         const days = data.weeks?.[week]?.[player];
         if (days && typeof days === 'object') {
           const values = Object.values(days);
-          setWeekTotal(values.length ? values.reduce((sum, v) => sum + v, 0) : null);
+          const scores = values.map((v) => (typeof v === 'number' ? v : (v && typeof v.score === 'number' ? v.score : 0)));
+          setWeekTotal(values.length ? scores.reduce((sum, v) => sum + v, 0) : null);
           setDaysPlayed(values.length);
         } else {
           setWeekTotal(null);

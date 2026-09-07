@@ -3,11 +3,21 @@ import { usePlayer } from './usePlayer';
 import { getLeaderboard, submitScore } from '../api';
 import { todayKey } from './season';
 
+function dayScore(v) {
+  // A day's stored value is either a plain number, or { score, ...meta }
+  if (typeof v === 'number') return v;
+  if (v && typeof v.score === 'number') return v.score;
+  return 0;
+}
+
 // Scores are summed across every day a player plays that week's game --
 // so playing all 5 days beats playing once, even with a lower single-day
 // score. `prevBest` here means "your best score TODAY specifically" (so
 // replaying the same day's puzzle shows whether you beat your own earlier
 // attempt), while `result.weekTotal` is the running sum for the whole week.
+// `finish` optionally takes a `meta` object (e.g. { time: 42.3 }) for
+// games that track extra info like completion time -- it's stored
+// alongside the score so the leaderboard can display/sort by it.
 export function useScoreSubmit(week) {
   const { player } = usePlayer();
   const [prevBest, setPrevBest] = useState(null);
@@ -20,20 +30,20 @@ export function useScoreSubmit(week) {
     getLeaderboard()
       .then((data) => {
         const days = data.weeks?.[week]?.[player];
-        const todayBest = days?.[todayKey()];
-        setPrevBest(typeof todayBest === 'number' ? todayBest : null);
+        const todayVal = days?.[todayKey()];
+        setPrevBest(todayVal !== undefined ? dayScore(todayVal) : null);
       })
       .catch(() => setPrevBest(null));
   }, [week, player]);
 
-  const finish = async (rawScore) => {
+  const finish = async (rawScore, meta) => {
     const score = Math.max(0, Math.round(rawScore));
     const dateKey = todayKey();
     let weekTotal = score;
     try {
-      const data = await submitScore(week, player, score, dateKey);
+      const data = await submitScore(week, player, score, dateKey, meta);
       const days = data.weeks?.[week]?.[player] || {};
-      weekTotal = Object.values(days).reduce((sum, v) => sum + v, 0);
+      weekTotal = Object.values(days).reduce((sum, v) => sum + dayScore(v), 0);
     } catch (e) {
       console.error('submit failed', e);
     }
