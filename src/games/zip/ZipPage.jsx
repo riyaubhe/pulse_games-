@@ -11,11 +11,11 @@ import { useScoreSubmit } from '../../lib/useScoreSubmit';
 // every cell once, moves only up/down/left/right, and hits the numbered
 // checkpoints in order counts as solved.
 const ZIP_PUZZLES = {
-  mon: { size: 5, checkpoints: [{r:0,c:0,num:1},{r:1,c:4,num:2},{r:2,c:0,num:3},{r:2,c:4,num:4},{r:3,c:0,num:5},{r:4,c:4,num:6}] },
-  tue: { size: 5, checkpoints: [{r:0,c:0,num:1},{r:4,c:1,num:2},{r:0,c:2,num:3},{r:4,c:2,num:4},{r:0,c:3,num:5},{r:4,c:4,num:6}] },
-  wed: { size: 5, checkpoints: [{r:0,c:0,num:1},{r:1,c:4,num:2},{r:4,c:2,num:3},{r:2,c:0,num:4},{r:2,c:3,num:5},{r:2,c:2,num:6}] },
-  thu: { size: 5, checkpoints: [{r:4,c:0,num:1},{r:3,c:4,num:2},{r:2,c:0,num:3},{r:2,c:4,num:4},{r:1,c:0,num:5},{r:0,c:4,num:6}] },
-  fri: { size: 5, checkpoints: [{r:0,c:4,num:1},{r:4,c:3,num:2},{r:0,c:2,num:3},{r:4,c:2,num:4},{r:0,c:1,num:5},{r:4,c:0,num:6}] },
+  mon: { size: 6, checkpoints: [{r:1,c:0,num:1},{r:0,c:5,num:2},{r:2,c:1,num:3},{r:5,c:2,num:4},{r:4,c:4,num:5},{r:2,c:2,num:6},{r:3,c:5,num:7}] },
+  tue: { size: 6, checkpoints: [{r:4,c:4,num:1},{r:1,c:5,num:2},{r:0,c:0,num:3},{r:5,c:1,num:4},{r:1,c:2,num:5},{r:2,c:3,num:6},{r:4,c:3,num:7}] },
+  wed: { size: 6, checkpoints: [{r:1,c:2,num:1},{r:1,c:4,num:2},{r:3,c:4,num:3},{r:0,c:1,num:4},{r:3,c:1,num:5},{r:4,c:2,num:6},{r:5,c:5,num:7}] },
+  thu: { size: 6, checkpoints: [{r:4,c:2,num:1},{r:3,c:1,num:2},{r:3,c:3,num:3},{r:4,c:4,num:4},{r:2,c:3,num:5},{r:0,c:3,num:6},{r:0,c:1,num:7}] },
+  fri: { size: 6, checkpoints: [{r:2,c:0,num:1},{r:3,c:1,num:2},{r:0,c:2,num:3},{r:5,c:3,num:4},{r:0,c:3,num:5},{r:2,c:5,num:6},{r:5,c:4,num:7}] },
 };
 const DAY_KEYS = ['sun','mon','tue','wed','thu','fri','sat'];
 
@@ -55,7 +55,7 @@ export default function ZipPage() {
   const finishGame = (solved) => {
     setDone(true);
     const elapsed = startRef.current ? (Date.now() - startRef.current) / 1000 : 60;
-    const score = solved ? Math.max(40, Math.round(150 - elapsed * 1.5)) : 0;
+    const score = solved ? Math.max(50, Math.round(220 - elapsed * 1.2)) : 0;
     setMessage(solved ? `Solved in ${Math.round(elapsed)}s! 🎉` : 'Out of moves — try again next time.');
     setTimeout(() => finish(score, solved ? { time: Math.round(elapsed * 10) / 10 } : undefined), 900);
   };
