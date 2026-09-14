@@ -60,7 +60,6 @@ export default function LeaderboardPage() {
 
       const hasTime = entries.some((e) => e.bestTime !== null);
       if (hasTime) {
-        // fastest time leads; anyone without a recorded time sorts to the bottom
         entries.sort((a, b) => {
           if (a.bestTime === null) return 1;
           if (b.bestTime === null) return -1;

@@ -3,19 +3,17 @@
 // and "answer" games (Wordle, Hangman, etc.) get a puzzle seeded from
 // the calendar date so everyone sees the same one on a given day.
 
-// Set this to the date Week 1 opens (local midnight). Update this one
-// line whenever the season restarts.
 export const SEASON_START = new Date("2026-08-31T00:00:00");
 
 export function getActiveWeek() {
   const msPerWeek = 7 * 24 * 60 * 60 * 1000;
   const diff = Date.now() - SEASON_START.getTime();
-  if (diff < 0) return 0; // season hasn't started
-  return Math.floor(diff / msPerWeek) + 1; // 1-14 while active, >14 once season ends
+  if (diff < 0) return 0;
+  return Math.floor(diff / msPerWeek) + 1;
 }
 
 export function isWeekday() {
-  const day = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+  const day = new Date().getDay();
   return day >= 1 && day <= 5;
 }
 

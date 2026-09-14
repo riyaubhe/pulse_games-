@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, CheckCircle2 } from 'lucide-react';
-import { getSchedule, setSchedule } from '../api';
+import { Shield, CheckCircle2, Trash2 } from 'lucide-react';
+import { getSchedule, setSchedule, deleteScore } from '../api';
 import { dateKeyFromInput, todayInputValue } from '../lib/adminUtils';
 
 const ADMIN_GAMES = [
@@ -22,7 +22,11 @@ export default function AdminPage() {
   const [target, setTarget] = useState('');
   const [sentence, setSentence] = useState('');
   const [overrides, setOverrides] = useState({});
-  const [status, setStatus] = useState(null); // { msg, error }
+  const [status, setStatus] = useState(null);
+  const [delWeek, setDelWeek] = useState('');
+  const [delPlayer, setDelPlayer] = useState('');
+  const [delDate, setDelDate] = useState('');
+  const [delStatus, setDelStatus] = useState(null);
 
   useEffect(() => {
     if (!authed) return;
@@ -63,6 +67,30 @@ export default function AdminPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!delWeek || !delPlayer.trim()) {
+      setDelStatus({ msg: 'Enter a week number and a player name.', error: true });
+      return;
+    }
+    const dateKey = delDate ? dateKeyFromInput(delDate) : undefined;
+    const scope = dateKey ? `their score for ${delDate}` : `ALL of their scores for the whole week`;
+    const confirmed = window.confirm(`Remove ${scope} — "${delPlayer.trim()}", Week ${delWeek}? This can't be undone.`);
+    if (!confirmed) return;
+    try {
+      await deleteScore(delWeek, delPlayer.trim(), adminKey, dateKey);
+      setDelStatus({ msg: 'Removed.', error: false });
+      setDelPlayer('');
+      setDelDate('');
+    } catch (e) {
+      if (e.response?.status === 401) {
+        setDelStatus({ msg: 'Invalid admin key.', error: true });
+        setAuthed(false);
+      } else {
+        setDelStatus({ msg: 'Something went wrong — try again.', error: true });
+      }
+    }
+  };
+
   if (!authed) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel max-w-md mx-auto text-center">
@@ -94,7 +122,6 @@ export default function AdminPage() {
       <h2 className="text-xl font-black font-display mb-1">🔑 Schedule a puzzle</h2>
       <p className="text-zinc-500 text-sm mb-6">Pick a game, a day, and the answer — it overrides the automatic daily pick for that day only.</p>
 
-      {/* Game tabs, styled after their AdminPanel.jsx tab pattern */}
       <div className="flex gap-2 p-1 bg-zinc-900/50 rounded-2xl border border-white/5 backdrop-blur-sm flex-wrap mb-4">
         {ADMIN_GAMES.map((g) => (
           <button
@@ -161,6 +188,40 @@ export default function AdminPage() {
           <CheckCircle2 className="w-4 h-4" /> Save for this day
         </button>
         {status && <p className={`text-sm text-center ${status.error ? 'text-red-400' : 'text-correct'}`}>{status.msg}</p>}
+      </div>
+
+      <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.18em] mt-8 mb-3">Remove a score</div>
+      <p className="text-zinc-500 text-xs mb-3">Leave the date blank to remove ALL of that player's scores for the week. Set a date to remove just that one day instead.</p>
+      <div className="flex flex-col gap-3">
+        <input
+          type="number"
+          min="1"
+          max="14"
+          placeholder="Week number (e.g. 2)"
+          value={delWeek}
+          onChange={(e) => setDelWeek(e.target.value)}
+          className="w-full p-3 rounded-xl bg-zinc-950/50 border border-border focus:border-accent outline-none"
+        />
+        <input
+          placeholder="Player name (exact match)"
+          value={delPlayer}
+          onChange={(e) => setDelPlayer(e.target.value)}
+          className="w-full p-3 rounded-xl bg-zinc-950/50 border border-border focus:border-accent outline-none"
+        />
+        <input
+          type="date"
+          placeholder="Specific day (optional)"
+          value={delDate}
+          onChange={(e) => setDelDate(e.target.value)}
+          className="w-full p-3 rounded-xl bg-zinc-950/50 border border-border focus:border-accent outline-none"
+        />
+        <button
+          onClick={handleDelete}
+          className="p-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-all active:scale-[0.98]"
+        >
+          <Trash2 className="w-4 h-4" /> {delDate ? "Remove just that day's score" : "Remove all of this player's scores for that week"}
+        </button>
+        {delStatus && <p className={`text-sm text-center ${delStatus.error ? 'text-red-400' : 'text-correct'}`}>{delStatus.msg}</p>}
       </div>
 
       {Object.keys(overrides).length > 0 && (

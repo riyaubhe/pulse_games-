@@ -1,29 +1,13 @@
 // Vercel serverless function: /api/leaderboard
-// GET  -> returns the current leaderboard { weeks, totals }
-//         where weeks[week][player] is an object of { dateKey: value },
-//         one entry per day that player played that week's game. Value
-//         is either a plain number (score) for most games, or an
-//         object { score, time } for games that track completion time
-//         (like Zip) -- `score` still feeds the season point totals,
-//         `time` is extra metadata the leaderboard can display/sort by.
-// POST -> body { week, player, score, dateKey, meta } submits a score
-//         for a specific day, with optional extra metadata (e.g.
-//         { time: 42.3 } for a timed game). Keeps only the best score
-//         per player per DAY, then the week's total for that player is
-//         the SUM of their best score from every day they played that
-//         week -- so someone who plays all 5 days beats someone who
-//         only played once, even with a lower single-day score.
+// GET    -> returns the current leaderboard { weeks, totals }
+// POST   -> body { week, player, score, dateKey, meta } submits a score
+//           for a specific day, keeping only the best score per player
+//           per DAY, then summing all days into the week's total.
+// DELETE -> requires header "x-admin-key". Body: { week, player, dateKey? }.
+//           If dateKey is given, removes just that one day's entry;
+//           otherwise removes the player's entire entry for that week.
 //
-// Backward compatible: earlier versions of this file stored a single
-// number per player per week (not per-day). Any data in that old shape
-// is automatically migrated in place -- old_score becomes
-// { legacy: old_score } -- so nothing already saved gets lost, it just
-// counts as one "day" going forward.
-//
-// Requires the Vercel KV integration to be added to this project
-// (Storage tab in the Vercel dashboard -> Create Database -> KV).
-// Vercel automatically sets the KV_* environment variables once
-// the integration is connected -- no manual config needed.
+// Requires the Vercel KV integration (Storage tab -> Create Database -> KV).
 
 import { kv } from "@vercel/kv";
 
@@ -35,8 +19,6 @@ function migrateWeeks(weeks) {
   Object.entries(weeks || {}).forEach(([week, players]) => {
     migrated[week] = {};
     Object.entries(players || {}).forEach(([name, value]) => {
-      // Old format: value was a plain number. New format: an object of
-      // { dateKey: value }. Wrap any old-format number so it survives.
       migrated[week][name] = typeof value === "number" ? { legacy: value } : value;
     });
   });
@@ -44,7 +26,6 @@ function migrateWeeks(weeks) {
 }
 
 function dayScore(v) {
-  // A day's value is either a plain number, or { score, ...meta }
   if (typeof v === "number") return v;
   if (v && typeof v.score === "number") return v.score;
   return 0;
@@ -95,6 +76,37 @@ export default async function handler(req, res) {
     return res.status(200).json(lb);
   }
 
-  res.setHeader("Allow", ["GET", "POST"]);
+  if (req.method === "DELETE") {
+    const adminKey = req.headers["x-admin-key"];
+    if (!process.env.ADMIN_KEY || adminKey !== process.env.ADMIN_KEY) {
+      return res.status(401).json({ error: "Invalid admin key" });
+    }
+
+    const { week, player, dateKey } = req.body || {};
+    if (!week || !player) {
+      return res.status(400).json({ error: "Missing week or player" });
+    }
+
+    const raw = (await kv.get(KEY)) || { weeks: {}, totals: {} };
+    const lb = { weeks: migrateWeeks(raw.weeks), totals: raw.totals || {} };
+
+    if (lb.weeks[week] && lb.weeks[week][player]) {
+      if (dateKey) {
+        delete lb.weeks[week][player][dateKey];
+        if (Object.keys(lb.weeks[week][player]).length === 0) {
+          delete lb.weeks[week][player];
+        }
+      } else {
+        delete lb.weeks[week][player];
+      }
+    }
+
+    lb.totals = recomputeSeasonTotals(lb.weeks);
+
+    await kv.set(KEY, lb);
+    return res.status(200).json(lb);
+  }
+
+  res.setHeader("Allow", ["GET", "POST", "DELETE"]);
   return res.status(405).end("Method Not Allowed");
 }

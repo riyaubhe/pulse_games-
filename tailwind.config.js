@@ -11,12 +11,12 @@ export default {
         display: ['Outfit', 'sans-serif'],
       },
       colors: {
-        correct: '#10b981', // Emerald 500
-        present: '#f59e0b', // Amber 500
-        absent: '#ef4444',  // Red 500
+        correct: '#10b981',
+        present: '#f59e0b',
+        absent: '#ef4444',
         border: 'rgba(255,255,255,0.05)',
-        dark: '#09090b',    // Zinc 950
-        accent: '#8b5cf6',  // Violet 500
+        dark: '#09090b',
+        accent: '#8b5cf6',
       },
       boxShadow: {
         'glow': '0 0 20px -5px rgba(139, 92, 246, 0.3)',

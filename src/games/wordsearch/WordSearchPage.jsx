@@ -5,21 +5,39 @@ import { useGameGuard } from '../../lib/useGameGuard';
 import { useScoreSubmit } from '../../lib/useScoreSubmit';
 import { makeSeededRng, todayKey } from '../../lib/season';
 
-const WORDS = ["RUBRIC", "THESIS", "SYLLABUS", "CITATION", "ANALYSIS", "FEEDBACK"];
-const SIZE = 10;
-const DIRS = [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]];
+// A completely different 6-word set each weekday.
+const WORD_SETS = {
+  mon: ["RUBRIC", "THESIS", "SYLLABUS", "CITATION", "ANALYSIS", "FEEDBACK"],
+  tue: ["LECTURE", "MENTOR", "DEADLINE", "DISCIPLINE", "SEMESTER", "GRADEBOOK"],
+  wed: ["PROCTOR", "REVISION", "FORMULA", "TRANSCRIPT", "PLAGIARISM", "CURRICULUM"],
+  thu: ["SCHOLARS", "PROBLEMS", "RESEARCH", "ACADEMIC", "LEARNING", "EQUATION"],
+  fri: ["HYPOTHESIS", "SYNTHESIS", "PARADIGM", "PEDAGOGY", "ANALYTICAL", "ANNOTATION"],
+};
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+function getTodayWords() {
+  const key = DAY_KEYS[new Date().getDay()];
+  return WORD_SETS[key] || WORD_SETS.mon;
+}
+
+const SIZE = 11;
+// Orthogonal only -- up/down/left/right, no diagonals. Matches how
+// LinkedIn's "Wend" word puzzle works: tap a letter, then tap the next
+// letter one step at a time in any of the 4 directions.
+const DIRS = [[0,1],[0,-1],[1,0],[-1,0]];
 
 function fits(r0, c0, dr, dc, len) {
   const r1 = r0 + dr * (len - 1), c1 = c0 + dc * (len - 1);
   return r1 >= 0 && r1 < SIZE && c1 >= 0 && c1 < SIZE;
 }
 
-function buildGrid() {
+function buildGrid(words) {
   const rng = makeSeededRng(todayKey() + ':wordsearch');
   const cells = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
-  WORDS.forEach((word) => {
+  const ordered = [...words].sort((a, b) => b.length - a.length);
+  ordered.forEach((word) => {
     let placed = false, attempts = 0;
-    while (!placed && attempts < 300) {
+    while (!placed && attempts < 2000) {
       attempts++;
       const [dr, dc] = DIRS[Math.floor(rng() * DIRS.length)];
       const r0 = Math.floor(rng() * SIZE), c0 = Math.floor(rng() * SIZE);
@@ -43,20 +61,31 @@ function buildGrid() {
 export default function WordSearchPage() {
   const { allowed, week } = useGameGuard('wordsearch');
   const { finish, result, prevBest } = useScoreSubmit(week);
-  const [cells] = useState(() => buildGrid());
+  const WORDS = useRef(getTodayWords()).current;
+  const [cells] = useState(() => buildGrid(WORDS));
   const [found, setFound] = useState(new Set());
   const [foundCells, setFoundCells] = useState(new Set());
-  const [selStart, setSelStart] = useState(null);
+  const [path, setPath] = useState([]); // array of "r,c" strings, in click order
   const [timeLeft, setTimeLeft] = useState(90);
   const [done, setDone] = useState(false);
+  const [message, setMessage] = useState('');
   const doneRef = useRef(false);
+  const startRef = useRef(null);
+  const pathSet = new Set(path);
 
   const finishGame = (allFound) => {
     if (doneRef.current) return;
     doneRef.current = true;
     setDone(true);
     const score = found.size * 18 + (allFound ? 12 : 0);
-    finish(score);
+    if (allFound) {
+      const elapsed = startRef.current ? (Date.now() - startRef.current) / 1000 : 90;
+      setMessage(`All 6 found in ${Math.round(elapsed)}s! 🎉`);
+      setTimeout(() => finish(score, { time: Math.round(elapsed * 10) / 10 }), 900);
+    } else {
+      setMessage(`Time's up — found ${found.size} of ${WORDS.length}.`);
+      setTimeout(() => finish(score), 900);
+    }
   };
 
   useEffect(() => {
@@ -70,38 +99,82 @@ export default function WordSearchPage() {
     return () => clearInterval(t);
   }, [allowed, done]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onCellClick = (r, c) => {
-    if (done) return;
-    if (!selStart) { setSelStart([r, c]); return; }
-    const [r0, c0] = selStart;
-    if (r0 === r && c0 === c) { setSelStart(null); return; }
-    const dr = Math.sign(r - r0), dc = Math.sign(c - c0);
-    const lenR = Math.abs(r - r0), lenC = Math.abs(c - c0);
-    const isLine = dr === 0 || dc === 0 || lenR === lenC;
-    if (!isLine) { setSelStart([r, c]); return; }
-    const len = Math.max(lenR, lenC) + 1;
-    let path = [], word = '';
-    for (let i = 0; i < len; i++) { const rr = r0 + dr * i, cc = c0 + dc * i; path.push([rr, cc]); word += cells[rr][cc]; }
+  const checkMatch = (currentPath) => {
+    const word = currentPath.map((k) => {
+      const [r, c] = k.split(',').map(Number);
+      return cells[r][c];
+    }).join('');
     const rev = word.split('').reverse().join('');
-    const match = WORDS.find((w) => (w === word || w === rev) && !found.has(w));
+    return WORDS.find((w) => (w === word || w === rev) && !found.has(w));
+  };
+
+  const clickCell = (r, c) => {
+    if (done) return;
+    if (startRef.current === null) startRef.current = Date.now();
+    const key = `${r},${c}`;
+
+    // Nothing selected yet -- this click starts a new word.
+    if (path.length === 0) {
+      setPath([key]);
+      setMessage('');
+      return;
+    }
+
+    const last = path[path.length - 1];
+
+    // Clicking the current last letter again cancels the selection.
+    if (last === key) {
+      setPath([]);
+      setMessage('');
+      return;
+    }
+
+    // Clicking the second-to-last letter undoes one step.
+    if (path.length >= 2 && path[path.length - 2] === key) {
+      setPath(path.slice(0, -1));
+      setMessage('');
+      return;
+    }
+
+    const [lr, lc] = last.split(',').map(Number);
+    const isAdjacent = Math.abs(lr - r) + Math.abs(lc - c) === 1;
+
+    if (!isAdjacent) {
+      // Not next to your last letter -- start a fresh word here instead.
+      setPath([key]);
+      setMessage('');
+      return;
+    }
+
+    if (pathSet.has(key)) { setMessage("You've already used that letter in this word."); return; }
+
+    const newPath = [...path, key];
+    const match = checkMatch(newPath);
     if (match) {
       const nf = new Set(found); nf.add(match); setFound(nf);
-      const nfc = new Set(foundCells); path.forEach(([rr, cc]) => nfc.add(`${rr},${cc}`)); setFoundCells(nfc);
+      const nfc = new Set(foundCells);
+      newPath.forEach((k) => nfc.add(k));
+      setFoundCells(nfc);
+      setPath([]);
+      setMessage(`Found "${match}"! 🎉`);
       if (nf.size === WORDS.length) { finishGame(true); }
+      return;
     }
-    setSelStart(null);
+
+    setPath(newPath);
+    setMessage('');
   };
 
   if (!allowed) return null;
 
   return (
-    <GameShell emoji="🔍" title="Word Search" tag="Find all 6 hidden study words." week={week}>
+    <GameShell emoji="🔍" title="Word Search" tag="Find all 6 hidden words — new words and grid every day." week={week}>
       {result ? (
         <ResultPanel score={result.score} isNewBest={result.isNewBest} prevBest={prevBest} weekTotal={result.weekTotal} />
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">
-            Click a letter, then click another in a straight line (any of the 8 directions, forwards or backwards) to select a word.
+            Click a letter to start a word. Click the next letter — directly up, down, left, or right, never diagonal — to add it, one step at a time. Reach one of the 6 words below to lock it in. Click your last letter again to cancel, or the one before it to undo a step.
           </p>
           <div className="flex gap-8">
             <div className="text-center">
@@ -113,17 +186,19 @@ export default function WordSearchPage() {
               <div className="text-[10px] uppercase tracking-widest text-zinc-500">Found</div>
             </div>
           </div>
-          <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${SIZE}, 34px)` }}>
+          <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${SIZE}, 30px)` }}>
             {cells.map((row, r) => row.map((letter, c) => {
               const key = `${r},${c}`;
               const isFound = foundCells.has(key);
-              const isSel = selStart && selStart[0] === r && selStart[1] === c;
+              const isInPath = pathSet.has(key);
+              const isLast = path[path.length - 1] === key;
               return (
                 <button
                   key={key}
-                  onClick={() => onCellClick(r, c)}
+                  onClick={() => clickCell(r, c)}
                   disabled={done}
-                  className={`grid-cell ${isFound ? 'found' : ''} ${isSel && !isFound ? 'selected' : ''}`}
+                  style={{ width: 30, height: 30, fontSize: 12 }}
+                  className={`grid-cell ${isFound ? 'found' : ''} ${isInPath && !isFound ? 'selected' : ''} ${isLast ? 'ring-2 ring-accent' : ''}`}
                 >
                   {letter}
                 </button>
@@ -133,6 +208,7 @@ export default function WordSearchPage() {
           <div className="flex flex-wrap gap-2 justify-center max-w-xs">
             {WORDS.map((w) => <span key={w} className={`chip ${found.has(w) ? 'hit' : ''}`}>{w}</span>)}
           </div>
+          {message && <p className="text-zinc-400 text-sm text-center">{message}</p>}
         </>
       )}
     </GameShell>

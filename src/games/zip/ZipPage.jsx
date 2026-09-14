@@ -4,12 +4,6 @@ import ResultPanel from '../../components/ResultPanel';
 import { useGameGuard } from '../../lib/useGameGuard';
 import { useScoreSubmit } from '../../lib/useScoreSubmit';
 
-// One verified, fully-solvable puzzle per weekday. Each is a complete
-// Hamiltonian path through every cell of the grid (hand-verified), with
-// 6 of its cells picked out and numbered as checkpoints. The player
-// doesn't need to reconstruct this exact path -- any path that visits
-// every cell once, moves only up/down/left/right, and hits the numbered
-// checkpoints in order counts as solved.
 const ZIP_PUZZLES = {
   mon: { size: 6, checkpoints: [{r:1,c:0,num:1},{r:0,c:5,num:2},{r:2,c:1,num:3},{r:5,c:2,num:4},{r:4,c:4,num:5},{r:2,c:2,num:6},{r:3,c:5,num:7}] },
   tue: { size: 6, checkpoints: [{r:4,c:4,num:1},{r:1,c:5,num:2},{r:0,c:0,num:3},{r:5,c:1,num:4},{r:1,c:2,num:5},{r:2,c:3,num:6},{r:4,c:3,num:7}] },
@@ -38,7 +32,7 @@ export default function ZipPage() {
   const totalCells = size * size;
   const maxNum = checkpoints.length;
 
-  const [path, setPath] = useState([]); // array of "r,c" strings, in order
+  const [path, setPath] = useState([]);
   const [nextNeeded, setNextNeeded] = useState(1);
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState('');
@@ -66,7 +60,6 @@ export default function ZipPage() {
     if (startRef.current === null) startRef.current = Date.now();
 
     if (path.length === 0) {
-      // must start on checkpoint 1
       if (checkpointMap[key] !== 1) { setMessage('Start on the number 1.'); return; }
       setPath([key]);
       setNextNeeded(2);
@@ -78,7 +71,6 @@ export default function ZipPage() {
     const [lr, lc] = last.split(',').map(Number);
     const isAdjacent = Math.abs(lr - r) + Math.abs(lc - c) === 1;
 
-    // clicking the second-to-last cell retracts the path by one step
     if (path.length >= 2 && path[path.length - 2] === key) {
       const removedKey = path[path.length - 1];
       const removedNum = checkpointMap[removedKey];
