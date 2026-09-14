@@ -58,6 +58,13 @@ function buildGrid(words) {
   return cells;
 }
 
+function formatElapsed(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+}
+
 export default function WordSearchPage() {
   const { allowed, week } = useGameGuard('wordsearch');
   const { finish, result, prevBest } = useScoreSubmit(week);
@@ -66,38 +73,31 @@ export default function WordSearchPage() {
   const [found, setFound] = useState(new Set());
   const [foundCells, setFoundCells] = useState(new Set());
   const [path, setPath] = useState([]); // array of "r,c" strings, in click order
-  const [timeLeft, setTimeLeft] = useState(90);
+  const [elapsed, setElapsed] = useState(0); // stopwatch, counts up -- no time limit
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState('');
   const doneRef = useRef(false);
   const startRef = useRef(null);
   const pathSet = new Set(path);
 
-  const finishGame = (allFound) => {
+  // Untimed -- the clock just ticks up for the player's own reference.
+  // There's no cutoff; the round only ends once all 6 words are found,
+  // and the leaderboard ranks by that final completion time.
+  useEffect(() => {
+    if (!allowed || done) return;
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [allowed, done]);
+
+  const finishGame = () => {
     if (doneRef.current) return;
     doneRef.current = true;
     setDone(true);
-    const score = found.size * 18 + (allFound ? 12 : 0);
-    if (allFound) {
-      const elapsed = startRef.current ? (Date.now() - startRef.current) / 1000 : 90;
-      setMessage(`All 6 found in ${Math.round(elapsed)}s! 🎉`);
-      setTimeout(() => finish(score, { time: Math.round(elapsed * 10) / 10 }), 900);
-    } else {
-      setMessage(`Time's up — found ${found.size} of ${WORDS.length}.`);
-      setTimeout(() => finish(score), 900);
-    }
+    const finalElapsed = startRef.current ? (Date.now() - startRef.current) / 1000 : elapsed;
+    const score = Math.max(50, Math.round(220 - finalElapsed * 1.2));
+    setMessage(`All 6 found in ${Math.round(finalElapsed)}s! 🎉`);
+    setTimeout(() => finish(score, { time: Math.round(finalElapsed * 10) / 10 }), 900);
   };
-
-  useEffect(() => {
-    if (!allowed || done) return;
-    const t = setInterval(() => {
-      setTimeLeft((s) => {
-        if (s <= 1) { clearInterval(t); finishGame(false); return 0; }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [allowed, done]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkMatch = (currentPath) => {
     const word = currentPath.map((k) => {
@@ -113,7 +113,6 @@ export default function WordSearchPage() {
     if (startRef.current === null) startRef.current = Date.now();
     const key = `${r},${c}`;
 
-    // Nothing selected yet -- this click starts a new word.
     if (path.length === 0) {
       setPath([key]);
       setMessage('');
@@ -122,14 +121,12 @@ export default function WordSearchPage() {
 
     const last = path[path.length - 1];
 
-    // Clicking the current last letter again cancels the selection.
     if (last === key) {
       setPath([]);
       setMessage('');
       return;
     }
 
-    // Clicking the second-to-last letter undoes one step.
     if (path.length >= 2 && path[path.length - 2] === key) {
       setPath(path.slice(0, -1));
       setMessage('');
@@ -140,7 +137,6 @@ export default function WordSearchPage() {
     const isAdjacent = Math.abs(lr - r) + Math.abs(lc - c) === 1;
 
     if (!isAdjacent) {
-      // Not next to your last letter -- start a fresh word here instead.
       setPath([key]);
       setMessage('');
       return;
@@ -157,7 +153,7 @@ export default function WordSearchPage() {
       setFoundCells(nfc);
       setPath([]);
       setMessage(`Found "${match}"! 🎉`);
-      if (nf.size === WORDS.length) { finishGame(true); }
+      if (nf.size === WORDS.length) { finishGame(); }
       return;
     }
 
@@ -174,12 +170,12 @@ export default function WordSearchPage() {
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">
-            Click a letter to start a word. Click the next letter — directly up, down, left, or right, never diagonal — to add it, one step at a time. Reach one of the 6 words below to lock it in. Click your last letter again to cancel, or the one before it to undo a step.
+            Click a letter to start a word. Click the next letter — directly up, down, left, or right, never diagonal — to add it, one step at a time. Reach one of the 6 words below to lock it in. Click your last letter again to cancel, or the one before it to undo a step. No time limit — fastest full solve wins the week.
           </p>
           <div className="flex gap-8">
             <div className="text-center">
-              <div className="text-3xl font-black font-display text-accent">{timeLeft}</div>
-              <div className="text-[10px] uppercase tracking-widest text-zinc-500">Seconds</div>
+              <div className="text-3xl font-black font-display text-accent">{formatElapsed(elapsed)}</div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-500">Time</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-black font-display text-correct">{found.size}/{WORDS.length}</div>
