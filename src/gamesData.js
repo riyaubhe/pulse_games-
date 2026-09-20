@@ -6,7 +6,7 @@
 export const GAMES = [
   { week: 1, id: "wordle", slug: "wordle", emoji: "🟩", title: "Wordle", tag: "Guess the 5-letter word in 6 tries." },
   { week: 2, id: "zip", slug: "zip", emoji: "🔗", title: "Zip", tag: "Draw one path through every cell, hitting the numbers in order." },
-  { week: 3, id: "wordsearch", slug: "wordsearch", emoji: "🔍", title: "Word Search", tag: "Find all 6 hidden words — new words and grid every day." },
+  { week: 3, id: "wordsearch", slug: "wordsearch", emoji: "🔍", title: "Word Search", tag: "Find all 6 hidden words — new words and grid every day.", rankBy: "plays" },
   { week: 4, id: "patches", slug: "patches", emoji: "🧩", title: "Patches", tag: "Divide the grid into rectangles — one number per patch.", rankBy: "plays" },
   { week: 5, id: "memory", slug: "memory", emoji: "🧠", title: "Memory Match", tag: "Flip cards and find all 8 pairs." },
   { week: 6, id: "hangman", slug: "hangman", emoji: "🪢", title: "Hangman", tag: "Guess the academic word before you run out of tries." },
