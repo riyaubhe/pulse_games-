@@ -72,13 +72,16 @@ export default function PatchesPage() {
 
   const [covered, setCovered] = useState({}); // cellKey -> patchId
   const [patches, setPatches] = useState([]); // [{id, cells:[key,...]}]
-  const [pending, setPending] = useState(null); // "r,c" of first-clicked corner
+  const [dragAnchor, setDragAnchor] = useState(null); // "r,c" -- where the drag started
+  const [dragCurrent, setDragCurrent] = useState(null); // "r,c" -- current pointer cell while dragging
   const [elapsed, setElapsed] = useState(0);
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState('');
   const doneRef = useRef(false);
   const startRef = useRef(null);
   const nextIdRef = useRef(1);
+  const gridRef = useRef(null);
+  const draggingRef = useRef(false);
 
   useEffect(() => {
     if (!allowed || done) return;
@@ -96,13 +99,28 @@ export default function PatchesPage() {
     setTimeout(() => finish(score, { time: Math.round(finalElapsed * 10) / 10 }), 900);
   };
 
-  const clickCell = (r, c) => {
+  const rectBetween = (keyA, keyB) => {
+    const [r0, c0] = keyA.split(',').map(Number);
+    const [r1, c1] = keyB.split(',').map(Number);
+    const rMin = Math.min(r0, r1), rMax = Math.max(r0, r1);
+    const cMin = Math.min(c0, c1), cMax = Math.max(c0, c1);
+    const cells = [];
+    for (let r = rMin; r <= rMax; r++) for (let c = cMin; c <= cMax; c++) cells.push(`${r},${c}`);
+    return cells;
+  };
+
+  const cellFromPoint = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    const target = el && el.closest ? el.closest('[data-cell]') : null;
+    return target ? target.getAttribute('data-cell') : null;
+  };
+
+  const startDrag = (key) => {
     if (done) return;
     if (startRef.current === null) startRef.current = Date.now();
-    const key = `${r},${c}`;
 
-    // Clicking a cell that's already part of a placed patch removes that
-    // whole patch, so a mistake can be undone.
+    // Tapping a cell that's already part of a placed patch removes that
+    // whole patch instead of starting a new drag, so mistakes are easy to undo.
     if (covered[key] !== undefined) {
       const patchId = covered[key];
       const nc = { ...covered };
@@ -113,34 +131,37 @@ export default function PatchesPage() {
       return;
     }
 
-    if (pending === null) { setPending(key); setMessage(''); return; }
-    if (pending === key) { setPending(null); setMessage(''); return; }
+    draggingRef.current = true;
+    setDragAnchor(key);
+    setDragCurrent(key);
+  };
 
-    const [r0, c0] = pending.split(',').map(Number);
-    const rMin = Math.min(r0, r), rMax = Math.max(r0, r);
-    const cMin = Math.min(c0, c), cMax = Math.max(c0, c);
+  const updateDrag = (x, y) => {
+    if (!draggingRef.current) return;
+    const key = cellFromPoint(x, y);
+    if (key) setDragCurrent((cur) => (cur === key ? cur : key));
+  };
 
-    const cellsInRect = [];
-    let overlap = false;
-    for (let rr = rMin; rr <= rMax; rr++) {
-      for (let cc = cMin; cc <= cMax; cc++) {
-        const k = `${rr},${cc}`;
-        if (covered[k] !== undefined) overlap = true;
-        cellsInRect.push(k);
-      }
-    }
-    if (overlap) { setMessage('That rectangle overlaps a patch you already placed.'); setPending(null); return; }
+  const endDrag = () => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    const anchor = dragAnchor, current = dragCurrent || dragAnchor;
+    setDragAnchor(null);
+    setDragCurrent(null);
+    if (!anchor) return;
+
+    const cellsInRect = rectBetween(anchor, current);
+    const overlap = cellsInRect.some((k) => covered[k] !== undefined);
+    if (overlap) { setMessage('That rectangle overlaps a patch you already placed.'); return; }
 
     const cluesInRect = cellsInRect.filter((k) => clues[k] !== undefined);
     if (cluesInRect.length !== 1) {
       setMessage(cluesInRect.length === 0 ? 'That rectangle needs to contain exactly one number.' : 'That rectangle contains more than one number.');
-      setPending(null);
       return;
     }
     const clueNum = clues[cluesInRect[0]];
     if (clueNum !== cellsInRect.length) {
       setMessage(`That rectangle has ${cellsInRect.length} cells, but the clue needs ${clueNum}.`);
-      setPending(null);
       return;
     }
 
@@ -149,11 +170,12 @@ export default function PatchesPage() {
     cellsInRect.forEach((k) => { nc[k] = id; });
     setCovered(nc);
     setPatches([...patches, { id, cells: cellsInRect }]);
-    setPending(null);
     setMessage('');
 
     if (Object.keys(nc).length === totalCells) finishGame();
   };
+
+  const previewCells = dragAnchor ? new Set(rectBetween(dragAnchor, dragCurrent || dragAnchor)) : null;
 
   if (!allowed) return null;
 
@@ -164,7 +186,7 @@ export default function PatchesPage() {
       ) : (
         <>
           <p className="text-zinc-500 text-xs text-center max-w-sm">
-            Click one corner of a rectangle, then click the opposite corner. Each rectangle must contain exactly one number, and its cell count must match that number. Cover the whole grid to win. Click any cell in a placed patch to undo it. No time limit — fastest solve wins the week.
+            Press down on one corner of a rectangle, drag to the opposite corner, and release. Each rectangle must contain exactly one number, and its cell count must match that number. Cover the whole grid to win. Tap any placed patch to undo it. No time limit — fastest solve wins the week.
           </p>
           <div className="flex gap-8">
             <div className="text-center">
@@ -177,20 +199,32 @@ export default function PatchesPage() {
             </div>
           </div>
 
-          <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${SIZE}, 38px)` }}>
+          <div
+            ref={gridRef}
+            className="grid gap-[2px] select-none touch-none"
+            style={{ gridTemplateColumns: `repeat(${SIZE}, 38px)` }}
+            onPointerMove={(e) => updateDrag(e.clientX, e.clientY)}
+            onPointerUp={endDrag}
+            onPointerLeave={(e) => { if (e.buttons === 0) endDrag(); }}
+          >
             {Array.from({ length: SIZE }).map((_, r) =>
               Array.from({ length: SIZE }).map((_, c) => {
                 const key = `${r},${c}`;
                 const clue = clues[key];
                 const patchId = covered[key];
-                const colorClass = patchId !== undefined ? PALETTE[(patchId - 1) % PALETTE.length] : 'bg-zinc-900/50 border-white/5';
-                const isPending = pending === key;
+                const isPreview = previewCells && previewCells.has(key) && patchId === undefined;
+                const colorClass = patchId !== undefined
+                  ? PALETTE[(patchId - 1) % PALETTE.length]
+                  : isPreview
+                    ? 'bg-white/20 border-white/40'
+                    : 'bg-zinc-900/50 border-white/5';
                 return (
                   <button
                     key={key}
-                    onClick={() => clickCell(r, c)}
+                    data-cell={key}
+                    onPointerDown={(e) => { e.preventDefault(); startDrag(key); }}
                     disabled={done}
-                    className={`w-[38px] h-[38px] rounded-md border flex items-center justify-center font-black font-display text-sm transition-all ${colorClass} ${isPending ? 'ring-2 ring-white' : ''}`}
+                    className={`w-[38px] h-[38px] rounded-md border flex items-center justify-center font-black font-display text-sm transition-colors ${colorClass}`}
                   >
                     {clue !== undefined ? clue : ''}
                   </button>
