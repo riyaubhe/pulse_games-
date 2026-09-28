@@ -25,9 +25,15 @@ function dayTime(v) {
 }
 
 function formatTime(seconds) {
-  if (seconds < 60) return `${seconds}s`;
-  const m = Math.floor(seconds / 60);
-  const s = Math.round(seconds % 60);
+  // Summing several 1-decimal times in JS can produce float noise like
+  // 57.800000000000004 -- round cleanly to 1 decimal before displaying.
+  const rounded = Math.round(seconds * 10) / 10;
+  if (rounded < 60) {
+    const display = Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1);
+    return `${display}s`;
+  }
+  const m = Math.floor(rounded / 60);
+  const s = Math.round(rounded % 60);
   return `${m}m ${s}s`;
 }
 

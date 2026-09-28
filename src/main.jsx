@@ -10,7 +10,7 @@ import WordlePage from './games/wordle/WordlePage.jsx';
 import ZipPage from './games/zip/ZipPage.jsx';
 import WordSearchPage from './games/wordsearch/WordSearchPage.jsx';
 import PatchesPage from './games/patches/PatchesPage.jsx';
-import MemoryPage from './games/memory/MemoryPage.jsx';
+import PinpointPage from './games/pinpoint/PinpointPage.jsx';
 import HangmanPage from './games/hangman/HangmanPage.jsx';
 import NumberHuntPage from './games/numguess/NumberHuntPage.jsx';
 import ConnectionsPage from './games/connections/ConnectionsPage.jsx';
@@ -36,7 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="games/zip" element={<ZipPage />} />
           <Route path="games/wordsearch" element={<WordSearchPage />} />
           <Route path="games/patches" element={<PatchesPage />} />
-          <Route path="games/memory" element={<MemoryPage />} />
+          <Route path="games/pinpoint" element={<PinpointPage />} />
           <Route path="games/hangman" element={<HangmanPage />} />
           <Route path="games/number-hunt" element={<NumberHuntPage />} />
           <Route path="games/connections" element={<ConnectionsPage />} />

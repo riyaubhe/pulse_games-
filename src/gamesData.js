@@ -8,7 +8,7 @@ export const GAMES = [
   { week: 2, id: "zip", slug: "zip", emoji: "🔗", title: "Zip", tag: "Draw one path through every cell, hitting the numbers in order." },
   { week: 3, id: "wordsearch", slug: "wordsearch", emoji: "🔍", title: "Word Search", tag: "Find all 6 hidden words — new words and grid every day.", rankBy: "plays" },
   { week: 4, id: "patches", slug: "patches", emoji: "🧩", title: "Patches", tag: "Divide the grid into rectangles — one number per patch.", rankBy: "plays" },
-  { week: 5, id: "memory", slug: "memory", emoji: "🧠", title: "Memory Match", tag: "Flip cards and find all 8 pairs." },
+  { week: 5, id: "pinpoint", slug: "pinpoint", emoji: "📍", title: "Pinpoint", tag: "Guess the category that connects all 5 clues.", rankBy: "plays" },
   { week: 6, id: "hangman", slug: "hangman", emoji: "🪢", title: "Hangman", tag: "Guess the academic word before you run out of tries." },
   { week: 7, id: "numguess", slug: "number-hunt", emoji: "🎯", title: "Number Hunt", tag: "Find the secret number 1–200 in 8 guesses." },
   { week: 8, id: "connections", slug: "connections", emoji: "🟪", title: "Study Connections", tag: "Find 4 groups of 4 related words." },
