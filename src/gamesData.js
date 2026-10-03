@@ -9,7 +9,7 @@ export const GAMES = [
   { week: 3, id: "wordsearch", slug: "wordsearch", emoji: "🔍", title: "Word Search", tag: "Find all 6 hidden words — new words and grid every day.", rankBy: "plays" },
   { week: 4, id: "patches", slug: "patches", emoji: "🧩", title: "Patches", tag: "Divide the grid into rectangles — one number per patch.", rankBy: "plays" },
   { week: 5, id: "pinpoint", slug: "pinpoint", emoji: "📍", title: "Pinpoint", tag: "Guess the category that connects all 5 clues.", rankBy: "plays" },
-  { week: 6, id: "hangman", slug: "hangman", emoji: "🪢", title: "Hangman", tag: "Guess the academic word before you run out of tries." },
+  { week: 6, id: "hangman", slug: "hangman", emoji: "🪢", title: "Hangman", tag: "Guess the word before you run out of tries.", rankBy: "plays" },
   { week: 7, id: "numguess", slug: "number-hunt", emoji: "🎯", title: "Number Hunt", tag: "Find the secret number 1–200 in 8 guesses." },
   { week: 8, id: "connections", slug: "connections", emoji: "🟪", title: "Study Connections", tag: "Find 4 groups of 4 related words." },
   { week: 9, id: "emoji", slug: "emoji-riddles", emoji: "😄", title: "Emoji Riddles", tag: "Decode 5 emoji clues." },

@@ -62,11 +62,12 @@ export default async function handler(req, res) {
     const raw = (await kv.get(KEY)) || { weeks: {}, totals: {} };
     const lb = { weeks: migrateWeeks(raw.weeks), totals: raw.totals || {} };
 
-    if (!lb.weeks[week]) lb.weeks[week] = {};
-    if (!lb.weeks[week][player]) lb.weeks[week][player] = {};
-
-    const prevDayBest = dayScore(lb.weeks[week][player][dateKey]);
+    // Only create the player's row when there is actually a score to save.
+    // A failed attempt (score 0) used to leave an empty "0 days" row behind.
+    const prevDayBest = dayScore(lb.weeks[week]?.[player]?.[dateKey]);
     if (score > prevDayBest) {
+      if (!lb.weeks[week]) lb.weeks[week] = {};
+      if (!lb.weeks[week][player]) lb.weeks[week][player] = {};
       lb.weeks[week][player][dateKey] = meta && typeof meta === "object" ? { score, ...meta } : score;
     }
 
