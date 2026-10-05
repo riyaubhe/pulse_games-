@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
                     <tr className="text-zinc-500 text-[10px] uppercase tracking-widest text-left border-b border-white/5">
                       <th className="py-2 w-10"></th>
                       <th className="py-2">Tutor</th>
-                      {w.hasTime && <th className="py-2 text-right">{w.rankByPlays ? 'Total time' : 'Best time'}</th>}
+                      {w.hasTime && <th className="py-2 text-right">{w.rankByPlays ? (w.timeLabel || 'Total time') : 'Best time'}</th>}
                       <th className="py-2 text-right">Days</th>
                       <th className="py-2 text-right">{w.hasTime ? 'Points' : 'Total'}</th>
                     </tr>
