@@ -13,7 +13,8 @@ import { getSchedule } from '../../api';
 // PREREQUISITE) give themselves away almost immediately. Measured by
 // simulating a sensible player (always guessing the letter found in the
 // most words that could still fit), the typical wrong guesses per word are:
-//   PARADIGM ~2, SYLLABUS ~3, BUZZWORD ~3, SYMPHONY ~4, RHYTHM ~5 (a loss).
+//   PARADIGM ~2, SYLLABUS ~3, BUZZWORD ~3, SYMPHONY ~4, RHYTHM ~5.
+// With 6 wrong guesses allowed, even RHYTHM is a narrow win for a sensible player.
 // The admin panel can still override any day's word + clue.
 const WORDS = {
   mon: { word: 'PARADIGM', clue: 'A typical model or pattern — a "shift" in one changes how a whole field thinks.' },
@@ -24,19 +25,19 @@ const WORDS = {
 };
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-const MAX_WRONG = 5;
+const MAX_WRONG = 6;
 const CLUE_TIME_PENALTY = 10; // seconds added to your time for peeking at the clue
 const CLUE_POINT_PENALTY = 20;
 const WRONG_GUESS_PENALTY = 10; // seconds added to your time per wrong guess -- fastest AND fewest guesses wins
 
-// The hangman is drawn as 5 parts, in this order, matching the 5 tries.
+// The hangman is drawn as 6 parts (the classic set), in this order, matching the 6 tries.
 //   FIGURE_STYLE = 'cut'   -> the whole hangman is there at the start and one
 //                             part is cut away per wrong guess (the last part
 //                             drawn goes first), like a lives meter.
 //   FIGURE_STYLE = 'build' -> the classic version: empty gallows, and one part
 //                             is drawn on per wrong guess.
 const FIGURE_STYLE = 'cut';
-const PARTS = ['head', 'body', 'arms', 'left leg', 'right leg']; // length must equal MAX_WRONG
+const PARTS = ['head', 'body', 'left arm', 'right arm', 'left leg', 'right leg']; // length must equal MAX_WRONG
 
 function HangmanFigure({ wrong }) {
   const isOn = (i) => (FIGURE_STYLE === 'cut' ? i < PARTS.length - wrong : i < wrong);
@@ -62,9 +63,10 @@ function HangmanFigure({ wrong }) {
       </g>
       <g {...partProps(0)}><circle cx="85" cy="38" r="11" /></g>
       <g {...partProps(1)}><line x1="85" y1="49" x2="85" y2="90" /></g>
-      <g {...partProps(2)}><line x1="85" y1="60" x2="65" y2="76" /><line x1="85" y1="60" x2="105" y2="76" /></g>
-      <g {...partProps(3)}><line x1="85" y1="90" x2="68" y2="118" /></g>
-      <g {...partProps(4)}><line x1="85" y1="90" x2="102" y2="118" /></g>
+      <g {...partProps(2)}><line x1="85" y1="60" x2="65" y2="76" /></g>
+      <g {...partProps(3)}><line x1="85" y1="60" x2="105" y2="76" /></g>
+      <g {...partProps(4)}><line x1="85" y1="90" x2="68" y2="118" /></g>
+      <g {...partProps(5)}><line x1="85" y1="90" x2="102" y2="118" /></g>
     </svg>
   );
 }

@@ -44,7 +44,7 @@ automatically every 7 days, Monday-Friday only.
 | 3 | Word Search (new words + grid every day, fastest full solve wins) |
 | 4 | Patches (rectangle-partition puzzle, most days played leads) |
 | 5 | Pinpoint (guess the hidden category, most days played leads) |
-| 6 | Hangman (hard words, 5 misses, +10s per wrong guess, most days won leads) |
+| 6 | Hangman (hard words, 6 misses, +10s per wrong guess, most days won leads) |
 | 7 | Number Hunt |
 | 8 | Study Connections |
 | 9 | Emoji Riddles |
