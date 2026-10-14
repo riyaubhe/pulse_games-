@@ -62,7 +62,9 @@ export default function LeaderboardPage() {
         const times = dayValues.map(dayTime).filter((t) => t !== null);
         const bestTime = times.length ? Math.min(...times) : null;
         const totalTime = times.length ? times.reduce((sum, t) => sum + t, 0) : null;
-        return { name, total, days: dayValues.length, bestTime, totalTime };
+        // timedDaysOnly: a week that switched games mid-week (Number Hunt -> Mini Sudoku)
+        // only counts days that have a recorded time as "played"; earlier points still count in totals.
+        return { name, total, days: g.timedDaysOnly ? times.length : dayValues.length, bestTime, totalTime };
       });
 
       const hasTime = entries.some((e) => e.bestTime !== null);

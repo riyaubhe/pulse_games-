@@ -27,7 +27,8 @@ export default function HomePage() {
           const values = Object.values(days);
           const scores = values.map((v) => (typeof v === 'number' ? v : (v && typeof v.score === 'number' ? v.score : 0)));
           setWeekTotal(values.length ? scores.reduce((sum, v) => sum + v, 0) : null);
-          setDaysPlayed(values.length);
+          const g = gameForWeek(week);
+          setDaysPlayed(g?.timedDaysOnly ? values.filter((v) => v && typeof v.time === 'number').length : values.length);
         } else {
           setWeekTotal(null);
           setDaysPlayed(0);

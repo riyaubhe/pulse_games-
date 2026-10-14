@@ -12,7 +12,7 @@ import WordSearchPage from './games/wordsearch/WordSearchPage.jsx';
 import PatchesPage from './games/patches/PatchesPage.jsx';
 import PinpointPage from './games/pinpoint/PinpointPage.jsx';
 import HangmanPage from './games/hangman/HangmanPage.jsx';
-import NumberHuntPage from './games/numguess/NumberHuntPage.jsx';
+import SudokuPage from './games/minisudoku/SudokuPage.jsx';
 import ConnectionsPage from './games/connections/ConnectionsPage.jsx';
 import EmojiRiddlesPage from './games/emoji/EmojiRiddlesPage.jsx';
 import MiniCrosswordPage from './games/minicrossword/MiniCrosswordPage.jsx';
@@ -38,7 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="games/patches" element={<PatchesPage />} />
           <Route path="games/pinpoint" element={<PinpointPage />} />
           <Route path="games/hangman" element={<HangmanPage />} />
-          <Route path="games/number-hunt" element={<NumberHuntPage />} />
+          <Route path="games/mini-sudoku" element={<SudokuPage />} />
           <Route path="games/connections" element={<ConnectionsPage />} />
           <Route path="games/emoji-riddles" element={<EmojiRiddlesPage />} />
           <Route path="games/mini-crossword" element={<MiniCrosswordPage />} />

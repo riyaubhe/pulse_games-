@@ -45,7 +45,7 @@ automatically every 7 days, Monday-Friday only.
 | 4 | Patches (rectangle-partition puzzle, most days played leads) |
 | 5 | Pinpoint (guess the hidden category, most days played leads) |
 | 6 | Hangman (hard words, 6 misses, +10s per wrong guess, most days won leads) |
-| 7 | Number Hunt |
+| 7 | Mini Sudoku (hard 6×6, timed; most days solved leads, ties go to lowest total time; replaced Number Hunt on Wed) |
 | 8 | Study Connections |
 | 9 | Emoji Riddles |
 | 10 | Mini Crossword |

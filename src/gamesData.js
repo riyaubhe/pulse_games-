@@ -10,7 +10,7 @@ export const GAMES = [
   { week: 4, id: "patches", slug: "patches", emoji: "🧩", title: "Patches", tag: "Divide the grid into rectangles — one number per patch.", rankBy: "plays" },
   { week: 5, id: "pinpoint", slug: "pinpoint", emoji: "📍", title: "Pinpoint", tag: "Guess the category that connects all 5 clues.", rankBy: "plays" },
   { week: 6, id: "hangman", slug: "hangman", emoji: "🪢", title: "Hangman", tag: "Guess the word before you run out of tries.", rankBy: "plays", timeLabel: "Total time (incl. penalties)" },
-  { week: 7, id: "numguess", slug: "number-hunt", emoji: "🎯", title: "Number Hunt", tag: "Find the secret number 1–200 in 8 guesses." },
+  { week: 7, id: "minisudoku", slug: "mini-sudoku", emoji: "🔢", title: "Mini Sudoku", tag: "Fill the 6×6 grid so every row, column and box has 1–6 — fastest solve wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time (incl. hints)" },
   { week: 8, id: "connections", slug: "connections", emoji: "🟪", title: "Study Connections", tag: "Find 4 groups of 4 related words." },
   { week: 9, id: "emoji", slug: "emoji-riddles", emoji: "😄", title: "Emoji Riddles", tag: "Decode 5 emoji clues." },
   { week: 10, id: "minicrossword", slug: "mini-crossword", emoji: "⬛", title: "Mini Crossword", tag: "A tiny 5×5 crossword — 4 clues, across and down." },
