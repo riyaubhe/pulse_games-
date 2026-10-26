@@ -46,8 +46,8 @@ automatically every 7 days, Monday-Friday only.
 | 5 | Pinpoint (guess the hidden category, most days played leads) |
 | 6 | Hangman (hard words, 6 misses, +10s per wrong guess, most days won leads) |
 | 7 | Mini Sudoku (hard 6×6, timed; most days solved leads, ties go to lowest total time; replaced Number Hunt on Wed) |
-| 8 | Study Connections |
-| 9 | Emoji Riddles |
+| 8 | Connections |
+| 9 | Word Hive (7-letter word game; difficulty ramps Mon moderate to Fri very hard; Genius rank = 100 pts/day) |
 | 10 | Mini Crossword |
 | 11 | Riddle Rush |
 | 12 | Word Chain Sprint |

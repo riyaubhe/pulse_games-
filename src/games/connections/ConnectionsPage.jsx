@@ -181,7 +181,7 @@ export default function ConnectionsPage() {
   };
 
   if (!allowed) return null;
-  const shell = { emoji: '🟪', title: 'Study Connections', tag: 'Find 4 groups of 4 related words.', week };
+  const shell = { emoji: '🟪', title: 'Connections', tag: 'Find 4 groups of 4 related words.', week };
 
   if (!ready) {
     return (

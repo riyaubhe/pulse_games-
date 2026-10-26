@@ -14,7 +14,7 @@ import PinpointPage from './games/pinpoint/PinpointPage.jsx';
 import HangmanPage from './games/hangman/HangmanPage.jsx';
 import SudokuPage from './games/minisudoku/SudokuPage.jsx';
 import ConnectionsPage from './games/connections/ConnectionsPage.jsx';
-import EmojiRiddlesPage from './games/emoji/EmojiRiddlesPage.jsx';
+import WordHivePage from './games/wordhive/WordHivePage.jsx';
 import MiniCrosswordPage from './games/minicrossword/MiniCrosswordPage.jsx';
 import RiddleRushPage from './games/riddlerush/RiddleRushPage.jsx';
 import WordChainPage from './games/wordchain/WordChainPage.jsx';
@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="games/hangman" element={<HangmanPage />} />
           <Route path="games/mini-sudoku" element={<SudokuPage />} />
           <Route path="games/connections" element={<ConnectionsPage />} />
-          <Route path="games/emoji-riddles" element={<EmojiRiddlesPage />} />
+          <Route path="games/word-hive" element={<WordHivePage />} />
           <Route path="games/mini-crossword" element={<MiniCrosswordPage />} />
           <Route path="games/riddle-rush" element={<RiddleRushPage />} />
           <Route path="games/word-chain" element={<WordChainPage />} />
