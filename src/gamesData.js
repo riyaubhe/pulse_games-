@@ -13,7 +13,7 @@ export const GAMES = [
   { week: 7, id: "minisudoku", slug: "mini-sudoku", emoji: "🔢", title: "Mini Sudoku", tag: "Fill the 6×6 grid so every row, column and box has 1–6 — fastest solve wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time (incl. hints)" },
   { week: 8, id: "connections", slug: "connections", emoji: "🟪", title: "Connections", tag: "Find 4 groups of 4 related words." },
   { week: 9, id: "wordhive", slug: "word-hive", emoji: "🐝", title: "Word Hive", tag: "Make words from 7 letters — every word needs the center letter. Find the pangram!" },
-  { week: 10, id: "minicrossword", slug: "mini-crossword", emoji: "⬛", title: "Mini Crossword", tag: "A tiny 5×5 crossword — 4 clues, across and down." },
+  { week: 10, id: "minicrossword", slug: "mini-crossword", emoji: "⬛", title: "Mini Crossword", tag: "A new 5×5 crossword every day — fastest solve wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time (incl. penalties)" },
   { week: 11, id: "riddlerush", slug: "riddle-rush", emoji: "🧩", title: "Riddle Rush", tag: "Solve 5 classic riddles as fast as you can." },
   { week: 12, id: "wordchain", slug: "word-chain", emoji: "🍫", title: "Word Chain Sprint", tag: "List study snacks & supplies before time runs out." },
   { week: 13, id: "typing", slug: "typing", emoji: "⌨️", title: "Typing Speed", tag: "Type the sentence as fast & accurately as you can." },
