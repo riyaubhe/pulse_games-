@@ -17,7 +17,7 @@ import ConnectionsPage from './games/connections/ConnectionsPage.jsx';
 import WordHivePage from './games/wordhive/WordHivePage.jsx';
 import MiniCrosswordPage from './games/minicrossword/MiniCrosswordPage.jsx';
 import StrandsPage from './games/strands/StrandsPage.jsx';
-import WordChainPage from './games/wordchain/WordChainPage.jsx';
+import CrossclimbPage from './games/crossclimb/CrossclimbPage.jsx';
 import TypingPage from './games/typing/TypingPage.jsx';
 import FinaleWordlePage from './games/finalewordle/FinaleWordlePage.jsx';
 
@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="games/word-hive" element={<WordHivePage />} />
           <Route path="games/mini-crossword" element={<MiniCrosswordPage />} />
           <Route path="games/strands" element={<StrandsPage />} />
-          <Route path="games/word-chain" element={<WordChainPage />} />
+          <Route path="games/crossclimb" element={<CrossclimbPage />} />
           <Route path="games/typing" element={<TypingPage />} />
           <Route path="games/championship-wordle" element={<FinaleWordlePage />} />
         </Route>

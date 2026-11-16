@@ -15,7 +15,7 @@ export const GAMES = [
   { week: 9, id: "wordhive", slug: "word-hive", emoji: "🐝", title: "Word Hive", tag: "Make words from 7 letters — every word needs the center letter. Find the pangram!" },
   { week: 10, id: "minicrossword", slug: "mini-crossword", emoji: "⬛", title: "Mini Crossword", tag: "A new 5×5 crossword every day — fastest solve wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time (incl. penalties)" },
   { week: 11, id: "strands", slug: "strands", emoji: "🧵", title: "Strands", tag: "Find the hidden theme words — fastest time wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time" },
-  { week: 12, id: "wordchain", slug: "word-chain", emoji: "🍫", title: "Word Chain Sprint", tag: "List study snacks & supplies before time runs out." },
+  { week: 12, id: "crossclimb", slug: "crossclimb", emoji: "🪜", title: "Crossclimb", tag: "Solve the clues, order the word ladder — fastest climb wins.", rankBy: "plays", timedDaysOnly: true, timeLabel: "Total time" },
   { week: 13, id: "typing", slug: "typing", emoji: "⌨️", title: "Typing Speed", tag: "Type the sentence as fast & accurately as you can." },
   { week: 14, id: "finalewordle", slug: "championship-wordle", emoji: "🏆", title: "Championship Wordle", tag: "Season finale — double points! Guess the harder word in 6 tries." },
 ];

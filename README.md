@@ -50,7 +50,7 @@ automatically every 7 days, Monday-Friday only.
 | 9 | Word Hive (7-letter word game; difficulty ramps Mon moderate to Fri very hard; Genius rank = 100 pts/day) |
 | 10 | Mini Crossword (new 5×5 every day, easy Mon to very hard Fri; most days solved leads, ties go to lowest total time) |
 | 11 | Strands (themed 6×8 word-finder, new theme every day, easy Mon to very hard Fri; most days solved leads, ties go to lowest total time) |
-| 12 | Word Chain Sprint |
+| 12 | Crossclimb (LinkedIn-style word ladder, new ladder every day; most days solved leads, ties go to lowest total time) |
 | 13 | Typing Speed |
 | 14 | Championship Wordle (double points) |
 
